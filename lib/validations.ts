@@ -22,7 +22,7 @@ export const PostSchema = z.object({
   content: z.string().min(1, "Content is required"),
   excerpt: z.string().optional(),
   slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
-  published: z.boolean().default(false),
+  published: z.boolean(),
   categoryIds: z.array(z.string()).optional(),
   tagIds: z.array(z.string()).optional(),
 })
