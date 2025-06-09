@@ -1,87 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
 import PostEditor from "@/components/blog/post-editor";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import type { PostInput } from "@/lib/validations";
-import type { Post } from "../../../types";
+import { useEditPost } from "./hooks";
 
 export default function EditPostPage() {
-	const router = useRouter();
-	const params = useParams();
-	const postId = params.id as string;
-
-	const [post, setPost] = useState<Post | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
-	const [isInitialLoading, setIsInitialLoading] = useState(true);
-
-	useEffect(() => {
-		if (postId) {
-			fetchPost();
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [postId]);
-
-	const fetchPost = async () => {
-		try {
-			setIsInitialLoading(true);
-			const response = await fetch(`/api/admin/posts/${postId}`);
-
-			if (!response.ok) {
-				if (response.status === 404) {
-					toast.error("Post not found");
-					router.push("/dashboard/posts");
-					return;
-				}
-				throw new Error("Failed to fetch post");
-			}
-
-			const postData = await response.json();
-			setPost(postData);
-		} catch (error) {
-			console.error("Error fetching post:", error);
-			toast.error("Failed to load post");
-			router.push("/dashboard/posts");
-		} finally {
-			setIsInitialLoading(false);
-		}
-	};
-
-	const handleSave = async (data: PostInput) => {
-		setIsLoading(true);
-		try {
-			const response = await fetch(`/api/admin/posts/${postId}`, {
-				method: "PATCH",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(data),
-			});
-
-			const responseData = await response.json();
-
-			if (!response.ok) {
-				throw new Error(responseData.error || "Failed to update post");
-			}
-
-			toast.success("Post updated successfully!");
-			router.push("/dashboard/posts");
-		} catch (error) {
-			console.error("Update error:", error);
-			toast.error(
-				error instanceof Error ? error.message : "Failed to update post",
-			);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const handleCancel = () => {
-		router.push("/dashboard/posts");
-	};
+	const { post, isLoading, isInitialLoading, handleSave, handleCancel } =
+		useEditPost();
 
 	if (isInitialLoading) {
 		return (

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -43,189 +42,27 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Plus, Search, MoreVertical, Edit, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import type { Category } from "../types";
-
-const CategorySchema = z.object({
-	name: z
-		.string()
-		.min(1, "Name is required")
-		.max(100, "Name must be less than 100 characters"),
-	description: z.string().optional(),
-	slug: z
-		.string()
-		.min(1, "Slug is required")
-		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
-});
-
-type CategoryInput = z.infer<typeof CategorySchema>;
+import { useCategories } from "./hooks";
 
 export default function CategoriesPage() {
-	const [categories, setCategories] = useState<Category[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [searchTerm, setSearchTerm] = useState("");
-	const [dialogOpen, setDialogOpen] = useState(false);
-	const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-	const [submitting, setSubmitting] = useState(false);
-
-	const form = useForm<CategoryInput>({
-		resolver: zodResolver(CategorySchema),
-		defaultValues: {
-			name: "",
-			description: "",
-			slug: "",
-		},
-	});
-
-	useEffect(() => {
-		fetchCategories();
-	}, []);
-
-	// Auto-generate slug from name
-	useEffect(() => {
-		const name = form.watch("name");
-		if (name && !editingCategory) {
-			const slug = name
-				.toLowerCase()
-				.replace(/[^a-z0-9]+/g, "-")
-				.replace(/(^-|-$)/g, "");
-			form.setValue("slug", slug);
-		}
-	}, [form, editingCategory]);
-
-	const fetchCategories = async () => {
-		try {
-			const response = await fetch("/api/admin/categories");
-			if (!response.ok) throw new Error("Failed to fetch categories");
-			const data = await response.json();
-			setCategories(data);
-		} catch {
-			toast.error("Failed to load categories");
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const handleCreate = async (data: CategoryInput) => {
-		setSubmitting(true);
-		try {
-			const response = await fetch("/api/admin/categories", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
-
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.message || "Failed to create category");
-			}
-
-			const newCategory = await response.json();
-			setCategories([...categories, newCategory]);
-			setDialogOpen(false);
-			form.reset();
-			toast.success("Category created successfully");
-		} catch (error) {
-			toast.error(
-				error instanceof Error ? error.message : "Failed to create category",
-			);
-		} finally {
-			setSubmitting(false);
-		}
-	};
-
-	const handleUpdate = async (data: CategoryInput) => {
-		if (!editingCategory) return;
-
-		setSubmitting(true);
-		try {
-			const response = await fetch(
-				`/api/admin/categories/${editingCategory.id}`,
-				{
-					method: "PATCH",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(data),
-				},
-			);
-
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.message || "Failed to update category");
-			}
-
-			const updatedCategory = await response.json();
-			setCategories(
-				categories.map((cat) =>
-					cat.id === editingCategory.id ? updatedCategory : cat,
-				),
-			);
-			setDialogOpen(false);
-			setEditingCategory(null);
-			form.reset();
-			toast.success("Category updated successfully");
-		} catch (error) {
-			toast.error(
-				error instanceof Error ? error.message : "Failed to update category",
-			);
-		} finally {
-			setSubmitting(false);
-		}
-	};
-
-	const handleDelete = async (id: string) => {
-		if (
-			!confirm(
-				"Are you sure you want to delete this category? This action cannot be undone.",
-			)
-		)
-			return;
-
-		try {
-			const response = await fetch(`/api/admin/categories/${id}`, {
-				method: "DELETE",
-			});
-
-			if (!response.ok) throw new Error("Failed to delete category");
-
-			setCategories(categories.filter((cat) => cat.id !== id));
-			toast.success("Category deleted successfully");
-		} catch {
-			toast.error("Failed to delete category");
-		}
-	};
-
-	const openEditDialog = (category: Category) => {
-		setEditingCategory(category);
-		form.reset({
-			name: category.name,
-			description: category.description || "",
-			slug: category.slug,
-		});
-		setDialogOpen(true);
-	};
-
-	const openCreateDialog = () => {
-		setEditingCategory(null);
-		form.reset();
-		setDialogOpen(true);
-	};
-
-	const filteredCategories = categories.filter(
-		(category) =>
-			category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			category.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-	);
-
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		});
-	};
+	const {
+		loading,
+		searchTerm,
+		dialogOpen,
+		editingCategory,
+		submitting,
+		filteredCategories,
+		stats,
+		form,
+		setSearchTerm,
+		setDialogOpen,
+		handleCreate,
+		handleUpdate,
+		handleDelete,
+		openEditDialog,
+		openCreateDialog,
+		formatDate,
+	} = useCategories();
 
 	if (loading) {
 		return (
@@ -289,7 +126,7 @@ export default function CategoriesPage() {
 									<TableRow>
 										<TableCell colSpan={5} className="text-center py-8">
 											<div className="text-muted-foreground">
-												{categories.length === 0
+												{stats.totalCategories === 0
 													? "No categories found. Create your first category!"
 													: "No categories match your search."}
 											</div>

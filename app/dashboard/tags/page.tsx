@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -42,179 +41,27 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Plus, Search, MoreVertical, Edit, Trash2, Hash } from "lucide-react";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import type { TagDetails } from "../types";
-
-const TagSchema = z.object({
-	name: z
-		.string()
-		.min(1, "Name is required")
-		.max(50, "Name must be less than 50 characters"),
-	slug: z
-		.string()
-		.min(1, "Slug is required")
-		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase with hyphens"),
-});
-
-type TagInput = z.infer<typeof TagSchema>;
+import { useTags } from "./hooks";
 
 export default function TagsPage() {
-	const [tags, setTags] = useState<TagDetails[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [searchTerm, setSearchTerm] = useState("");
-	const [dialogOpen, setDialogOpen] = useState(false);
-	const [editingTag, setEditingTag] = useState<TagDetails | null>(null);
-	const [submitting, setSubmitting] = useState(false);
-
-	const form = useForm<TagInput>({
-		resolver: zodResolver(TagSchema),
-		defaultValues: {
-			name: "",
-			slug: "",
-		},
-	});
-
-	useEffect(() => {
-		fetchTags();
-	}, []);
-
-	// Auto-generate slug from name
-	useEffect(() => {
-		const name = form.watch("name");
-		if (name && !editingTag) {
-			const slug = name
-				.toLowerCase()
-				.replace(/[^a-z0-9]+/g, "-")
-				.replace(/(^-|-$)/g, "");
-			form.setValue("slug", slug);
-		}
-	}, [form, editingTag]);
-
-	const fetchTags = async () => {
-		try {
-			const response = await fetch("/api/admin/tags");
-			if (!response.ok) throw new Error("Failed to fetch tags");
-			const data = await response.json();
-			setTags(data);
-		} catch {
-			toast.error("Failed to load tags");
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const handleCreate = async (data: TagInput) => {
-		setSubmitting(true);
-		try {
-			const response = await fetch("/api/admin/tags", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
-
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.message || "Failed to create tag");
-			}
-
-			const newTag = await response.json();
-			setTags([...tags, newTag]);
-			setDialogOpen(false);
-			form.reset();
-			toast.success("Tag created successfully");
-		} catch (error) {
-			toast.error(
-				error instanceof Error ? error.message : "Failed to create tag",
-			);
-		} finally {
-			setSubmitting(false);
-		}
-	};
-
-	const handleUpdate = async (data: TagInput) => {
-		if (!editingTag) return;
-
-		setSubmitting(true);
-		try {
-			const response = await fetch(`/api/admin/tags/${editingTag.id}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
-
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.message || "Failed to update tag");
-			}
-
-			const updatedTag = await response.json();
-			setTags(tags.map((tag) => (tag.id === editingTag.id ? updatedTag : tag)));
-			setDialogOpen(false);
-			setEditingTag(null);
-			form.reset();
-			toast.success("Tag updated successfully");
-		} catch (error) {
-			toast.error(
-				error instanceof Error ? error.message : "Failed to update tag",
-			);
-		} finally {
-			setSubmitting(false);
-		}
-	};
-
-	const handleDelete = async (id: string) => {
-		if (
-			!confirm(
-				"Are you sure you want to delete this tag? This action cannot be undone.",
-			)
-		)
-			return;
-
-		try {
-			const response = await fetch(`/api/admin/tags/${id}`, {
-				method: "DELETE",
-			});
-
-			if (!response.ok) throw new Error("Failed to delete tag");
-
-			setTags(tags.filter((tag) => tag.id !== id));
-			toast.success("Tag deleted successfully");
-		} catch {
-			toast.error("Failed to delete tag");
-		}
-	};
-
-	const openEditDialog = (tag: TagDetails) => {
-		setEditingTag(tag);
-		form.reset({
-			name: tag.name,
-			slug: tag.slug,
-		});
-		setDialogOpen(true);
-	};
-
-	const openCreateDialog = () => {
-		setEditingTag(null);
-		form.reset();
-		setDialogOpen(true);
-	};
-
-	const filteredTags = tags.filter(
-		(tag) =>
-			tag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			tag.slug.toLowerCase().includes(searchTerm.toLowerCase()),
-	);
-
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		});
-	};
+	const {
+		loading,
+		searchTerm,
+		dialogOpen,
+		editingTag,
+		submitting,
+		filteredTags,
+		stats,
+		form,
+		setSearchTerm,
+		setDialogOpen,
+		handleCreate,
+		handleUpdate,
+		handleDelete,
+		openEditDialog,
+		openCreateDialog,
+		formatDate,
+	} = useTags();
 
 	if (loading) {
 		return (
@@ -279,7 +126,7 @@ export default function TagsPage() {
 										<TableRow>
 											<TableCell colSpan={5} className="text-center py-8">
 												<div className="text-muted-foreground">
-													{tags.length === 0
+													{stats.totalTags === 0
 														? "No tags found. Create your first tag!"
 														: "No tags match your search."}
 												</div>
@@ -347,7 +194,7 @@ export default function TagsPage() {
 							<CardTitle className="text-sm font-medium">Total Tags</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">{tags.length}</div>
+							<div className="text-2xl font-bold">{stats.totalTags}</div>
 						</CardContent>
 					</Card>
 
@@ -356,9 +203,7 @@ export default function TagsPage() {
 							<CardTitle className="text-sm font-medium">Tags in Use</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">
-								{tags.filter((tag) => tag._count.posts > 0).length}
-							</div>
+							<div className="text-2xl font-bold">{stats.tagsInUse}</div>
 						</CardContent>
 					</Card>
 
@@ -367,9 +212,7 @@ export default function TagsPage() {
 							<CardTitle className="text-sm font-medium">Unused Tags</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">
-								{tags.filter((tag) => tag._count.posts === 0).length}
-							</div>
+							<div className="text-2xl font-bold">{stats.unusedTags}</div>
 						</CardContent>
 					</Card>
 				</div>
