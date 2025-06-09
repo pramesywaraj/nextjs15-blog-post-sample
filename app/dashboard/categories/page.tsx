@@ -47,6 +47,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import type { Category } from "../types";
 
 const CategorySchema = z.object({
 	name: z
@@ -61,18 +62,6 @@ const CategorySchema = z.object({
 });
 
 type CategoryInput = z.infer<typeof CategorySchema>;
-
-interface Category {
-	id: string;
-	name: string;
-	description: string | null;
-	slug: string;
-	createdAt: string;
-	updatedAt: string;
-	_count: {
-		posts: number;
-	};
-}
 
 export default function CategoriesPage() {
 	const [categories, setCategories] = useState<Category[]>([]);

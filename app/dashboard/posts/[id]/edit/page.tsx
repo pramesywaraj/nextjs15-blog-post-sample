@@ -7,17 +7,7 @@ import PostEditor from "@/components/blog/post-editor";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import type { PostInput } from "@/lib/validations";
-
-interface Post {
-	id: string;
-	title: string;
-	content: string;
-	excerpt?: string;
-	slug: string;
-	published: boolean;
-	categories: Array<{ id: string; name: string; slug: string }>;
-	tags: Array<{ id: string; name: string; slug: string }>;
-}
+import type { Post } from "../../../types";
 
 export default function EditPostPage() {
 	const router = useRouter();

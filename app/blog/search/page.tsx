@@ -11,34 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, CalendarDays, Search, X } from "lucide-react";
 import { Suspense } from "react";
-
-interface SearchParams {
-	q?: string;
-	category?: string;
-}
-
-interface Post {
-	id: string;
-	title: string;
-	slug: string;
-	excerpt: string | null;
-	publishedAt: string | null;
-	createdAt: string;
-	author: {
-		name: string | null;
-		image: string | null;
-	};
-	categories: {
-		id: string;
-		name: string;
-		slug: string;
-	}[];
-	tags: {
-		id: string;
-		name: string;
-		slug: string;
-	}[];
-}
+import type { SearchParams, Post } from "../types";
 
 async function searchPosts(query: string, category?: string) {
 	try {

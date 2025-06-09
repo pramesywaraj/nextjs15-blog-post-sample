@@ -17,51 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CalendarDays, Search, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useDebounce } from "@/hooks/use-debounce";
-
-interface Post {
-	id: string;
-	title: string;
-	slug: string;
-	excerpt: string | null;
-	publishedAt: string | null;
-	createdAt: string;
-	author: {
-		name: string | null;
-		image: string | null;
-	};
-	categories: {
-		id: string;
-		name: string;
-		slug: string;
-	}[];
-	tags: {
-		id: string;
-		name: string;
-		slug: string;
-	}[];
-}
-
-interface SearchResult {
-	posts: Post[];
-	pagination: {
-		total: number;
-		limit: number;
-		offset: number;
-		hasMore: boolean;
-	};
-	query: string;
-	category?: string;
-}
-
-interface SearchPostsProps {
-	initialPosts: Post[];
-	categories: Array<{
-		id: string;
-		name: string;
-		slug: string;
-		_count: { posts: number };
-	}>;
-}
+import type { SearchPostsProps, SearchResult, Post } from "./types";
 
 export default function SearchPosts({
 	initialPosts,
@@ -80,7 +36,7 @@ export default function SearchPosts({
 	const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
 	const performSearch = useCallback(
-		async (query: string, category: string = "all") => {
+		async (query: string, category: string) => {
 			if (!query.trim()) {
 				setPosts(initialPosts);
 				setSearchResult(null);

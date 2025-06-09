@@ -9,40 +9,7 @@ import { prisma } from "@/lib/prisma";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
-interface BlogPostPageProps {
-	params: Promise<{ slug: string }>;
-}
-
-interface PostCategory {
-	id: string;
-	name: string;
-	slug: string;
-}
-
-interface PostTag {
-	id: string;
-	name: string;
-	slug: string;
-}
-
-interface PostAuthor {
-	name: string | null;
-	email: string;
-	image: string | null;
-}
-
-interface BlogPost {
-	id: string;
-	title: string;
-	content: string;
-	excerpt: string | null;
-	slug: string;
-	createdAt: Date;
-	updatedAt: Date;
-	author: PostAuthor;
-	categories: PostCategory[];
-	tags: PostTag[];
-}
+import type { BlogPostPageProps, BlogPost } from "../types";
 
 async function getPost(slug: string) {
 	const post = await prisma.post.findUnique({

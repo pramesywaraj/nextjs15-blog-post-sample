@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { PostInput } from "@/lib/validations";
+import type { PostEditorProps, Category, Tag } from "./types";
 
 // Local schema for the editor
 const PostEditorSchema = z.object({
@@ -47,36 +47,6 @@ const MDEditor = dynamic(
 	() => import("@uiw/react-md-editor").then((mod) => mod.default),
 	{ ssr: false },
 );
-
-interface Category {
-	id: string;
-	name: string;
-	slug: string;
-}
-
-interface Tag {
-	id: string;
-	name: string;
-	slug: string;
-}
-
-interface PostData {
-	id?: string;
-	title: string;
-	content: string;
-	excerpt?: string;
-	slug: string;
-	published: boolean;
-	categories?: Category[];
-	tags?: Tag[];
-}
-
-interface PostEditorProps {
-	initialData?: PostData;
-	onSave: (data: PostInput) => Promise<void>;
-	onCancel: () => void;
-	isLoading?: boolean;
-}
 
 export default function PostEditor({
 	initialData,

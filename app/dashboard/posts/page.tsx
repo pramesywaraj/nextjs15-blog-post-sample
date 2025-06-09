@@ -42,36 +42,11 @@ import {
 	Eye,
 } from "lucide-react";
 import { toast } from "sonner";
-
-interface Post {
-	id: string;
-	title: string;
-	slug: string;
-	excerpt: string | null;
-	published: boolean;
-	createdAt: string;
-	updatedAt: string;
-	author: {
-		name: string | null;
-		email: string;
-	};
-	categories: {
-		id: string;
-		name: string;
-	}[];
-	_count: {
-		tags: number;
-	};
-}
-
-interface Category {
-	id: string;
-	name: string;
-}
+import type { PostDetails, Category } from "../types";
 
 export default function PostsPage() {
 	const router = useRouter();
-	const [posts, setPosts] = useState<Post[]>([]);
+	const [posts, setPosts] = useState<PostDetails[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [searchTerm, setSearchTerm] = useState("");

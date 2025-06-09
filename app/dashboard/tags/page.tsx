@@ -46,6 +46,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import type { TagDetails } from "../types";
 
 const TagSchema = z.object({
 	name: z
@@ -60,23 +61,12 @@ const TagSchema = z.object({
 
 type TagInput = z.infer<typeof TagSchema>;
 
-interface TagType {
-	id: string;
-	name: string;
-	slug: string;
-	createdAt: string;
-	updatedAt: string;
-	_count: {
-		posts: number;
-	};
-}
-
 export default function TagsPage() {
-	const [tags, setTags] = useState<TagType[]>([]);
+	const [tags, setTags] = useState<TagDetails[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [dialogOpen, setDialogOpen] = useState(false);
-	const [editingTag, setEditingTag] = useState<TagType | null>(null);
+	const [editingTag, setEditingTag] = useState<TagDetails | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 
 	const form = useForm<TagInput>({
@@ -197,7 +187,7 @@ export default function TagsPage() {
 		}
 	};
 
-	const openEditDialog = (tag: TagType) => {
+	const openEditDialog = (tag: TagDetails) => {
 		setEditingTag(tag);
 		form.reset({
 			name: tag.name,

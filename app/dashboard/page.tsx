@@ -18,20 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-
-interface PostCategory {
-	id: string;
-	name: string;
-}
-
-interface RecentPost {
-	id: string;
-	title: string;
-	slug: string;
-	published: boolean;
-	createdAt: Date;
-	categories: PostCategory[];
-}
+import type { RecentPost, PostCategory } from "./types";
 
 async function getDashboardStats() {
 	try {
