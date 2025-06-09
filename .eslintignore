@@ -1,0 +1,43 @@
+scripts/docker-entrypoint.sh
+lib/generated/*
+prisma/*
+
+# Build outputs
+.next/*
+out/*
+dist/*
+
+# Dependencies
+node_modules/*
+
+# Environment files
+.env*
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/*
+.idea/*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Test coverage
+coverage/*
+
+# Storybook build outputs
+storybook-static/*
+
+# Example: Ignore specific files
+# components/legacy/*
+# utils/old-helper.ts
