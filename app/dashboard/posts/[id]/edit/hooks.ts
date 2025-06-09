@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import type { PostInput } from "@/lib/validations";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { fetchPost, updatePost } from "../../actions";
-import type { PostInput } from "@/lib/validations";
 import type { Post } from "../../types";
 
 export const useEditPost = () => {
@@ -53,7 +53,6 @@ export const useEditPost = () => {
 		router.push("/dashboard/posts");
 	};
 
-	// Fetch post on mount
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (postId) {

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import type { PostInput } from "@/lib/validations";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { createPost } from "../actions";
-import type { PostInput } from "@/lib/validations";
 
 export const useNewPost = () => {
 	const router = useRouter();

@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import type { Metadata } from "next";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -8,71 +8,23 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarDays, ArrowLeft, FolderOpen } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import type { CategoryPageProps } from "../../types";
-
-async function getCategory(slug: string) {
-	try {
-		return await prisma.category.findUnique({
-			where: { slug },
-			include: {
-				posts: {
-					where: { published: true },
-					include: {
-						author: {
-							select: {
-								name: true,
-								image: true,
-							},
-						},
-						categories: true,
-						tags: true,
-					},
-					orderBy: { publishedAt: "desc" },
-				},
-				_count: {
-					select: {
-						posts: {
-							where: { published: true },
-						},
-					},
-				},
-			},
-		});
-	} catch (error) {
-		console.error("Error fetching category:", error);
-		return null;
-	}
-}
-
-async function getAllCategories() {
-	try {
-		return await prisma.category.findMany({
-			include: {
-				_count: {
-					select: {
-						posts: {
-							where: { published: true },
-						},
-					},
-				},
-			},
-		});
-	} catch (error) {
-		console.error("Error fetching categories:", error);
-		return [];
-	}
-}
+import { ArrowLeft, CalendarDays, FolderOpen } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getCategoryData } from "./services";
+import type { Category, CategoryPageProps, BlogPost, Tag } from "./types";
+import {
+	formatPostDate,
+	generateMetaDescription,
+	generateMetaTitle,
+} from "./utils";
 
 export async function generateMetadata({
 	params,
 }: CategoryPageProps): Promise<Metadata> {
 	const { slug } = await params;
-	const category = await getCategory(slug);
+	const { category } = await getCategoryData(slug);
 
 	if (!category) {
 		return {
@@ -81,10 +33,11 @@ export async function generateMetadata({
 		};
 	}
 
-	const title = `${category.name} - Modern Blog`;
-	const description =
-		category.description ||
-		`Browse all posts in the ${category.name} category on Modern Blog. Discover articles, tutorials, and insights.`;
+	const title = generateMetaTitle(category.name);
+	const description = generateMetaDescription(
+		category.name,
+		category.description,
+	);
 
 	return {
 		title,
@@ -109,10 +62,7 @@ export async function generateMetadata({
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
 	const { slug } = await params;
-	const [category, allCategories] = await Promise.all([
-		getCategory(slug),
-		getAllCategories(),
-	]);
+	const { category, allCategories } = await getCategoryData(slug);
 
 	if (!category) {
 		notFound();
@@ -195,7 +145,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 												All Posts
 											</Button>
 										</Link>
-										{allCategories.map((cat) => (
+										{allCategories.map((cat: Category) => (
 											<Link
 												key={cat.id}
 												href={`/blog/category/${cat.slug}`}
@@ -236,7 +186,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
 						{posts.length > 0 ? (
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								{posts.map((post) => (
+								{posts.map((post: BlogPost) => (
 									<Card
 										key={post.id}
 										className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg"
@@ -255,9 +205,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 													</p>
 													<div className="flex items-center text-xs text-slate-500">
 														<CalendarDays className="w-3 h-3 mr-1" />
-														{post.publishedAt
-															? new Date(post.publishedAt).toLocaleDateString()
-															: new Date(post.createdAt).toLocaleDateString()}
+														{formatPostDate(
+															post.publishedAt
+																? new Date(post.publishedAt)
+																: null,
+															new Date(post.createdAt),
+														)}
 													</div>
 												</div>
 											</div>
@@ -285,7 +238,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 														{cat.name}
 													</Badge>
 												))}
-												{post.tags.slice(0, 3).map((tag) => (
+												{post.tags.slice(0, 3).map((tag: Tag) => (
 													<Badge
 														key={tag.id}
 														variant="outline"

@@ -1,3 +1,5 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -5,20 +7,18 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { prisma } from "@/lib/prisma";
 import {
+	Edit,
+	Eye,
 	FileText,
 	FolderOpen,
-	Tags,
-	Eye,
-	TrendingUp,
 	Plus,
-	Edit,
+	Tags,
+	TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import type { RecentPost, PostCategory } from "./types";
+import type { PostCategory, RecentPost } from "./types";
 
 async function getDashboardStats() {
 	try {

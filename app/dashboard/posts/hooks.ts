@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import type { PostDetails, Category } from "./types";
 import {
-	fetchPosts,
-	fetchCategories,
 	deletePost,
+	fetchCategories,
+	fetchPosts,
 	updatePostStatus,
 } from "./actions";
+import type { Category, PostDetails } from "./types";
 
 export const usePosts = () => {
 	const router = useRouter();

@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { createTag, deleteTag, fetchTags, updateTag } from "./actions";
 import type { TagDetails } from "./types";
-import { fetchTags, createTag, updateTag, deleteTag } from "./actions";
-import { TagSchema, type TagInput } from "./validation";
+import { type TagInput, TagSchema } from "./validation";
 
 export const useTags = () => {
 	const [tags, setTags] = useState<TagDetails[]>([]);

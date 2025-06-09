@@ -1,9 +1,9 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import type { Prisma } from "@/lib/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { CategoryUpdateSchema } from "@/lib/validations";
-import type { Prisma } from "@/lib/generated/prisma";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 // GET /api/admin/categories/[id]
 export async function GET(

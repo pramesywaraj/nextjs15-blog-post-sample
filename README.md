@@ -253,7 +253,6 @@ npm run docker:clean
 - **Zod**: Runtime type validation
 
 ### Development
-- **ESLint**: Code linting
 - **Prettier**: Code formatting
 - **TypeScript**: Static type checking
 

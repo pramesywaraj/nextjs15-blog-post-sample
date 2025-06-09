@@ -1,8 +1,8 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PostSchema } from "@/lib/validations";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 // GET /api/admin/posts
 export async function GET() {

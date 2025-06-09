@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
-import type { PostEditorProps, Category, Tag } from "./types";
+import type { Category, PostEditorProps, Tag } from "./types";
 
 // Local schema for the editor
 const PostEditorSchema = z.object({
@@ -18,10 +18,8 @@ const PostEditorSchema = z.object({
 });
 
 type PostEditorInput = z.infer<typeof PostEditorSchema>;
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import {
 	Card,
 	CardContent,
@@ -29,7 +27,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
 	Form,
 	FormControl,
@@ -38,9 +35,12 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { Save } from "lucide-react";
-import { toast } from "sonner";
 import dynamic from "next/dynamic";
+import { toast } from "sonner";
 
 // Dynamically import MDEditor to avoid SSR issues
 const MDEditor = dynamic(

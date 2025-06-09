@@ -1,8 +1,8 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { CategorySchema } from "@/lib/validations";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 // GET /api/admin/categories
 export async function GET() {

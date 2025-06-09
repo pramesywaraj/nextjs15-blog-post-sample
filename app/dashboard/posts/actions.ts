@@ -1,6 +1,6 @@
-import type { PostDetails, Category, Post } from "./types";
-import type { PostUpdate } from "./validation";
 import type { PostInput } from "@/lib/validations";
+import type { Category, Post, PostDetails } from "./types";
+import type { PostUpdate } from "./validation";
 
 export const fetchPosts = async (): Promise<PostDetails[]> => {
 	const response = await fetch("/api/admin/posts");

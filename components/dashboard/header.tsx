@@ -1,8 +1,7 @@
 "use client";
 
-import { signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -12,6 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings, User } from "lucide-react";
+import { signOut } from "next-auth/react";
 import type { DashboardHeaderProps } from "./types";
 
 export function DashboardHeader({ user }: DashboardHeaderProps) {

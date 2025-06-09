@@ -23,14 +23,24 @@ export interface PostAuthor {
 export interface BlogPost {
 	id: string;
 	title: string;
-	content: string;
-	excerpt: string | null;
 	slug: string;
+	excerpt: string | null;
+	publishedAt: Date | null;
 	createdAt: Date;
-	updatedAt: Date;
-	author: PostAuthor;
-	categories: PostCategory[];
-	tags: PostTag[];
+	author: {
+		name: string | null;
+		image: string | null;
+	};
+	categories: Array<{
+		id: string;
+		name: string;
+		slug: string;
+	}>;
+	tags: Array<{
+		id: string;
+		name: string;
+		slug: string;
+	}>;
 }
 
 export interface CategoryPageProps {
@@ -65,4 +75,27 @@ export interface Post {
 		name: string;
 		slug: string;
 	}[];
+}
+
+export interface Category {
+	id: string;
+	name: string;
+	slug: string;
+	_count: {
+		posts: number;
+	};
+}
+
+export interface BlogPageData {
+	posts: BlogPost[];
+	categories: Category[];
+}
+
+export interface PostCardProps {
+	post: BlogPost;
+}
+
+export interface CategoriesSidebarProps {
+	categories: Category[];
+	totalPosts: number;
 }
