@@ -220,8 +220,9 @@ export default function PostsPage() {
           </div>
 
           {/* Posts Table */}
-          <div className="rounded-md border">
-            <Table>
+          <div className="w-full overflow-x-auto">
+            <div className="rounded-md border min-w-full">
+              <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
@@ -246,10 +247,13 @@ export default function PostsPage() {
                     <TableRow key={post.id}>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{post.title}</div>
+                          <div className="font-medium truncate">{post.title}</div>
                           {post.excerpt && (
-                            <div className="text-sm text-muted-foreground line-clamp-1">
-                              {post.excerpt}
+                            <div className="text-sm text-muted-foreground overflow-hidden">
+                              {post.excerpt.length > 50 
+                                ? `${post.excerpt.substring(0, 100)}...` 
+                                : post.excerpt
+                              }
                             </div>
                           )}
                         </div>
@@ -312,6 +316,7 @@ export default function PostsPage() {
                 )}
               </TableBody>
             </Table>
+            </div>
           </div>
         </CardContent>
       </Card>
