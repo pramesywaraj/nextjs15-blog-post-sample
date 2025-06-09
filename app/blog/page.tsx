@@ -1,10 +1,11 @@
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CalendarDays, ArrowLeft, Search } from "lucide-react"
+import { ArrowLeft, CalendarDays, Search } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { Suspense } from "react"
 
 async function getAllPosts() {
   try {
@@ -48,6 +49,35 @@ async function getCategories() {
   }
 }
 
+function SearchForm() {
+  return (
+    <form action="/blog/search" method="GET">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Search className="h-5 w-5" />
+            Search Articles
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              name="q"
+              placeholder="Search posts by title, content, or tags..."
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <Button type="submit" className="w-full mt-3">
+            Search
+          </Button>
+        </CardContent>
+      </Card>
+    </form>
+  )
+}
+
 export default async function BlogPage() {
   const [posts, categories] = await Promise.all([
     getAllPosts(),
@@ -88,21 +118,9 @@ export default async function BlogPage() {
           <aside className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">
               {/* Search */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Search</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                    <input
-                      type="text"
-                      placeholder="Search posts..."
-                      className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              <Suspense fallback={<div>Loading search...</div>}>
+                <SearchForm />
+              </Suspense>
 
               {/* Categories */}
               <Card>
@@ -136,7 +154,7 @@ export default async function BlogPage() {
             <div className="mb-6">
               <h2 className="text-3xl font-bold text-slate-900 mb-2">Latest Articles</h2>
               <p className="text-slate-600">
-                Discover our latest insights, tutorials, and stories
+                Discover our latest insights, tutorials, and stories. Use the search form to find specific content.
               </p>
             </div>
 

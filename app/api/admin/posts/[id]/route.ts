@@ -6,7 +6,7 @@ import { PostUpdateSchema } from "@/lib/validations"
 // GET /api/admin/posts/[id]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -14,8 +14,9 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         author: {
           select: {
@@ -45,7 +46,7 @@ export async function GET(
 // PATCH /api/admin/posts/[id]
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -53,12 +54,13 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
 
     // For simple updates like toggling published status
     if (body.published !== undefined && Object.keys(body).length === 1) {
       const post = await prisma.post.update({
-        where: { id: params.id },
+        where: { id },
         data: { published: body.published },
         include: {
           author: {
@@ -75,9 +77,11 @@ export async function PATCH(
       return NextResponse.json(post)
     }
 
-    // For full post updates
-    const validatedFields = PostUpdateSchema.safeParse(body)
+    // For full post updates - create a schema that doesn't require the id field
+    const PostUpdatePayloadSchema = PostUpdateSchema.omit({ id: true })
+    const validatedFields = PostUpdatePayloadSchema.safeParse(body)
     if (!validatedFields.success) {
+      console.error("Validation error:", validatedFields.error.format())
       return NextResponse.json(
         { error: "Invalid input", details: validatedFields.error.format() },
         { status: 400 }
@@ -91,7 +95,7 @@ export async function PATCH(
       const existingPost = await prisma.post.findFirst({
         where: { 
           slug,
-          NOT: { id: params.id }
+          NOT: { id }
         }
       })
 
@@ -116,7 +120,7 @@ export async function PATCH(
     if (categoryIds !== undefined) {
       updateData.categories = {
         set: [], // Clear existing categories
-        connect: categoryIds.map(id => ({ id }))
+        connect: categoryIds.map(catId => ({ id: catId }))
       }
     }
 
@@ -124,12 +128,12 @@ export async function PATCH(
     if (tagIds !== undefined) {
       updateData.tags = {
         set: [], // Clear existing tags
-        connect: tagIds.map(id => ({ id }))
+        connect: tagIds.map(tagId => ({ id: tagId }))
       }
     }
 
     const post = await prisma.post.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         author: {
@@ -156,7 +160,7 @@ export async function PATCH(
 // DELETE /api/admin/posts/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -164,8 +168,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const post = await prisma.post.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!post) {
@@ -173,7 +178,7 @@ export async function DELETE(
     }
 
     await prisma.post.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "Post deleted successfully" })

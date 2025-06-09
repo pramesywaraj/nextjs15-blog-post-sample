@@ -10,7 +10,6 @@ export default function NewPostPage() {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSave = async (data: any) => {
-    console.log("handleSave called with data:", data)
     setIsLoading(true)
     try {
       const response = await fetch("/api/admin/posts", {
@@ -22,7 +21,6 @@ export default function NewPostPage() {
       })
 
       const responseData = await response.json()
-      console.log("API response:", response.status, responseData)
 
       if (!response.ok) {
         throw new Error(responseData.message || responseData.error || "Failed to create post")

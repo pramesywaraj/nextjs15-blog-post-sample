@@ -163,7 +163,6 @@ export default function PostEditor({ initialData, onSave, onCancel, isLoading }:
         tagIds: selectedTags,
       }
       
-      console.log("Submitting post data:", submitData) // Debug log
       await onSave(submitData)
     } catch (error) {
       console.error("Post submission error:", error)

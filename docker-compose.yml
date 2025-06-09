@@ -21,9 +21,7 @@ services:
 
   # Next.js Application
   app:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    image: fullstack-blog:latest
     restart: unless-stopped
     environment:
       - NODE_ENV=production

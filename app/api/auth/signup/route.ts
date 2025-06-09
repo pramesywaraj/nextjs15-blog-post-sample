@@ -7,12 +7,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    console.log('body', body)
-    
     // Validate input
     const validatedFields = SignUpSchema.safeParse(body)
-
-    console.log('validatedFields', validatedFields)
 
     if (!validatedFields.success) {
       return NextResponse.json(

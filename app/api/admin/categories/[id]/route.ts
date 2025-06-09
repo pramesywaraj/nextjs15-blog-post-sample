@@ -6,7 +6,7 @@ import { CategoryUpdateSchema } from "@/lib/validations"
 // GET /api/admin/categories/[id]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -14,8 +14,9 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const category = await prisma.category.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -42,7 +43,7 @@ export async function GET(
 // PATCH /api/admin/categories/[id]
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -50,10 +51,12 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
 
     // Validate input
-    const validatedFields = CategoryUpdateSchema.safeParse(body)
+    const CategoryUpdatePayloadSchema = CategoryUpdateSchema.omit({ id: true })
+    const validatedFields = CategoryUpdatePayloadSchema.safeParse(body)
     if (!validatedFields.success) {
       return NextResponse.json(
         { error: "Invalid input", details: validatedFields.error.format() },
@@ -68,7 +71,7 @@ export async function PATCH(
       const existingCategory = await prisma.category.findFirst({
         where: {
           AND: [
-            { NOT: { id: params.id } },
+            { NOT: { id } },
             {
               OR: [
                 ...(name ? [{ name }] : []),
@@ -93,7 +96,7 @@ export async function PATCH(
     if (slug !== undefined) updateData.slug = slug
 
     const category = await prisma.category.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         _count: {
@@ -117,7 +120,7 @@ export async function PATCH(
 // DELETE /api/admin/categories/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -125,8 +128,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const category = await prisma.category.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -149,7 +153,7 @@ export async function DELETE(
     }
 
     await prisma.category.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "Category deleted successfully" })

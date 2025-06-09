@@ -9,9 +9,9 @@ import { CalendarDays, ArrowLeft, FolderOpen } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 
 interface CategoryPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 async function getCategory(slug: string) {

@@ -6,7 +6,7 @@ import { TagUpdateSchema } from "@/lib/validations"
 // GET /api/admin/tags/[id]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -14,8 +14,9 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const tag = await prisma.tag.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -42,7 +43,7 @@ export async function GET(
 // PATCH /api/admin/tags/[id]
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -50,10 +51,12 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
 
     // Validate input
-    const validatedFields = TagUpdateSchema.safeParse(body)
+    const TagUpdatePayloadSchema = TagUpdateSchema.omit({ id: true })
+    const validatedFields = TagUpdatePayloadSchema.safeParse(body)
     if (!validatedFields.success) {
       return NextResponse.json(
         { error: "Invalid input", details: validatedFields.error.format() },
@@ -68,7 +71,7 @@ export async function PATCH(
       const existingTag = await prisma.tag.findFirst({
         where: {
           AND: [
-            { NOT: { id: params.id } },
+            { NOT: { id } },
             {
               OR: [
                 ...(name ? [{ name }] : []),
@@ -92,7 +95,7 @@ export async function PATCH(
     if (slug !== undefined) updateData.slug = slug
 
     const tag = await prisma.tag.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         _count: {
@@ -116,7 +119,7 @@ export async function PATCH(
 // DELETE /api/admin/tags/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -124,8 +127,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const tag = await prisma.tag.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -148,7 +152,7 @@ export async function DELETE(
     }
 
     await prisma.tag.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: "Tag deleted successfully" })

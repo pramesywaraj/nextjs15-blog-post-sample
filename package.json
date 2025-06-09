@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "docker:build": "docker build -t fullstack-blog .",
+    "docker:build": "docker build --no-cache -t fullstack-blog .",
     "docker:run": "docker run -p 3000:3000 --env-file .env fullstack-blog",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",

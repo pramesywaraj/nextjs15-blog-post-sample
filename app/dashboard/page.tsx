@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { FileText, FolderOpen, Tags, Eye, TrendingUp, Plus } from "lucide-react"
+import { FileText, FolderOpen, Tags, Eye, TrendingUp, Plus, Edit } from "lucide-react"
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
 
@@ -154,11 +154,20 @@ export default async function DashboardPage() {
                       {new Date(post.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <Link href={`/dashboard/posts/${post.id}/edit`}>
-                    <Button variant="ghost" size="sm">
-                      Edit
-                    </Button>
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link href={`/dashboard/posts/${post.id}/edit`}>
+                      <Button variant="ghost" size="sm">
+                        Edit
+                      </Button>
+                    </Link>
+                    {post.published && (
+                      <Link href={`/blog/${post.slug}`} target="_blank">
+                        <Button variant="ghost" size="sm">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
                 </div>
               ))
             ) : (
@@ -186,6 +195,14 @@ export default async function DashboardPage() {
                 Create New Post
               </Button>
             </Link>
+            {stats.recentPosts.length > 0 && (
+              <Link href={`/dashboard/posts/${stats.recentPosts[0].id}/edit`}>
+                <Button variant="outline" className="w-full justify-start">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Latest Post
+                </Button>
+              </Link>
+            )}
             <Link href="/dashboard/categories">
               <Button variant="outline" className="w-full justify-start">
                 <FolderOpen className="w-4 h-4 mr-2" />
