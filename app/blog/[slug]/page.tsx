@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {
 	ArticleContent,
+	ArticleContentHTML,
 	AuthorBio,
 	BackToBlogButton,
 	MoreArticlesButton,
@@ -56,7 +57,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 							createdAt={post.createdAt}
 							readingTime={readingTime}
 						/>
-						<ArticleContent content={post.content} />
+						{/* <ArticleContent content={post.content} /> */}
+						<ArticleContentHTML content={post.content} />
 						<PostTags tags={post.tags} />
 						<AuthorBio author={post.author} />
 						<MoreArticlesButton />

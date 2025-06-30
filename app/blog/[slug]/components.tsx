@@ -60,6 +60,10 @@ export function PostMeta({ author, createdAt, readingTime }: PostMetaProps) {
 	);
 }
 
+export function ArticleContentHTML({ content }: { content: string }) {
+	return <div className="prose prose-lg max-w-none mb-8" dangerouslySetInnerHTML={{ __html: content }} />
+}
+
 export function ArticleContent({ content }: { content: string }) {
 	return (
 		<div className="prose prose-lg max-w-none mb-8">
