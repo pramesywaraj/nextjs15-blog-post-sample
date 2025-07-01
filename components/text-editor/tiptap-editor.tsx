@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 
 import "./styles.css";
+import { uploadImageToCloudinary } from "@/lib/uploadImage";
 
 const lowlight = createLowlight();
 
@@ -110,13 +111,20 @@ export default function TiptapEditor({
   });
 
   const handleImageUpload = async (file: File, view: any) => {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const src = reader.result as string;
-      editor?.chain().focus().setImage({ src }).run();
-    }
+    // const reader = new FileReader();
+    // reader.onload = async (e) => {
+    //   const src = reader.result as string;
+    //   editor?.chain().focus().setImage({ src }).run();
+    // }
 
-    reader.readAsDataURL(file);
+    // reader.readAsDataURL(file);
+    try {
+      const url = await uploadImageToCloudinary(file);
+
+      editor?.chain().focus().setImage({ src: url }).run();
+    } catch (error) {
+      alert("Image upload failed");
+    }
 }
 
   if (!editor) return null;
