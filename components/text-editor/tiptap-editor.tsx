@@ -1,15 +1,16 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import Heading from "@tiptap/extension-heading";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+
+import ResizableImage from "./resizeable-image";
 
 import { createLowlight } from "lowlight";
 import {
@@ -18,7 +19,6 @@ import {
   UnderlineIcon,
   Strikethrough,
   Highlighter,
-  Type,
   List,
   ListOrdered,
   Quote,
@@ -26,12 +26,13 @@ import {
   Code2,
   LinkIcon,
   ImageIcon,
-  TableIcon,
   AlignLeft,
   AlignCenter,
   AlignRight,
   Undo2,
   Redo2,
+  Minimize2,
+  Maximize,
 } from "lucide-react";
 
 import "./styles.css";
@@ -66,6 +67,7 @@ export default function TiptapEditor({
   content = "",
   onChange,
 }: TiptapEditorProps) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -73,7 +75,7 @@ export default function TiptapEditor({
       }),
       Underline,
       Link,
-      Image,
+      ResizableImage,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Highlight,
       CodeBlockLowlight.configure({ lowlight }),
@@ -130,8 +132,11 @@ export default function TiptapEditor({
   if (!editor) return null;
 
   return (
-    <div className="tiptap-editor">
+    <div className={`tiptap-editor document-prose ${isFullscreen ? "fixed inset-0 w-screen h-screen bg-white z-50 p-8 max-w-none" : "relative w-full"}`}>
       <div className="toolbar">
+        <ToolbarButton onClick={() => setIsFullscreen((v) => !v)}>
+          {isFullscreen ? <Minimize2 size={16} /> : <Maximize size={16} />}
+        </ToolbarButton>
         <ToolbarButton
           onClick={() => {
             editor.chain().focus().toggleHeading({ level: 1 }).run();
@@ -263,7 +268,7 @@ export default function TiptapEditor({
           <Redo2 size={16} />
         </ToolbarButton>
       </div>
-      <EditorContent editor={editor} className="prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none" />
+      <EditorContent editor={editor} className={`prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none ${isFullscreen ? 'w-full h-full !max-w-none': ''}`} />
     </div>
   );
 }

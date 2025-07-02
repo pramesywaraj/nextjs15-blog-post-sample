@@ -23,14 +23,14 @@
 
   .tiptap-editor .ProseMirror {
     min-height: 120px;      /* Like a textarea's rows=4 */
-    max-height: 500px;      /* Or whatever you want */
+    width: 100%;
     overflow-y: auto;
     resize: vertical;       /* Allows manual stretching like a textarea */
     box-sizing: border-box;
     outline: none;
     padding: 0.5rem;
     font-size: 1rem;
-    line-height: 1.5;
+    line-height: 1.15;
   }
 /* 
   .tiptap-editor h1 {
