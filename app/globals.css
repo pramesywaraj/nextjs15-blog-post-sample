@@ -121,3 +121,393 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+/* Enhanced Prose Styles for Document-like Formatting */
+/* Use with: <div class="prose prose-lg max-w-none document-prose"> */
+
+.document-prose {
+	/* Base typography matching Google Docs */
+	line-height: 1.15;
+  }
+  
+  /* Headings - Google Docs style */
+  .document-prose h1 {
+	@apply text-3xl font-bold text-gray-900 mt-8 mb-4 leading-tight;
+	font-weight: 600;
+	letter-spacing: -0.025em;
+	page-break-after: avoid;
+  }
+  
+  .document-prose h2 {
+	@apply text-2xl font-semibold text-gray-900 mt-7 mb-3 leading-tight;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	page-break-after: avoid;
+  }
+  
+  .document-prose h3 {
+	@apply text-xl font-semibold text-gray-900 mt-6 mb-3 leading-tight;
+	font-weight: 500;
+	page-break-after: avoid;
+  }
+  
+  .document-prose h4 {
+	@apply text-lg font-medium text-gray-900 mt-5 mb-2 leading-tight;
+	font-weight: 500;
+	page-break-after: avoid;
+  }
+  
+  .document-prose h5 {
+	@apply text-base font-medium text-gray-900 mt-4 mb-2 leading-tight;
+	font-weight: 500;
+  }
+  
+  .document-prose h6 {
+	@apply text-sm font-medium text-gray-700 mt-4 mb-2 leading-tight uppercase tracking-wide;
+	font-weight: 500;
+  }
+  
+  /* Paragraphs - optimized for reading */
+  .document-prose p {
+	@apply text-base text-gray-800 mb-4 leading-relaxed;
+	text-align: justify;
+	hyphens: auto;
+	word-break: break-word;
+	orphans: 2;
+	widows: 2;
+  }
+  
+  /* First paragraph after headings */
+  .document-prose h1 + p,
+  .document-prose h2 + p,
+  .document-prose h3 + p,
+  .document-prose h4 + p,
+  .document-prose h5 + p,
+  .document-prose h6 + p {
+	@apply mt-0;
+  }
+  
+  /* Lists - clean and readable */
+  .document-prose ul,
+  .document-prose ol {
+	@apply my-4 pl-6;
+  }
+  
+  .document-prose ul {
+	list-style-type: disc;
+  }
+  
+  .document-prose ol {
+	list-style-type: decimal;
+  }
+  
+  .document-prose li {
+	@apply mb-2 text-gray-800 leading-relaxed;
+	text-align: justify;
+  }
+  
+  .document-prose li::marker {
+	@apply text-gray-600;
+  }
+  
+  /* Nested lists */
+  .document-prose ul ul,
+  .document-prose ol ol,
+  .document-prose ul ol,
+  .document-prose ol ul {
+	@apply mt-1 mb-1;
+  }
+  
+  .document-prose ul ul {
+	list-style-type: circle;
+  }
+  
+  .document-prose ul ul ul {
+	list-style-type: square;
+  }
+  
+  /* Task lists (if using task list extension) */
+  .document-prose ul[data-type="taskList"] {
+	list-style: none;
+	@apply pl-0;
+  }
+  
+  .document-prose li[data-type="taskItem"] {
+	@apply flex items-start gap-2;
+  }
+  
+  .document-prose li[data-type="taskItem"] input[type="checkbox"] {
+	@apply mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500;
+  }
+  
+  /* Blockquotes - elegant styling */
+  .document-prose blockquote {
+	@apply border-l-4 border-blue-500 pl-6 py-2 my-6 italic text-gray-700 bg-blue-50 rounded-r-lg;
+	quotes: """ """ "'" "'";
+  }
+  
+  .document-prose blockquote::before {
+	content: open-quote;
+	@apply text-blue-500 text-2xl font-bold mr-1;
+  }
+  
+  .document-prose blockquote p {
+	@apply mb-2 last:mb-0;
+  }
+  
+  /* Code blocks and inline code */
+  .document-prose code {
+	@apply bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono;
+	font-size: 0.9em;
+  }
+  
+  .document-prose pre {
+	@apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-6;
+	font-family: 'Fira Code', 'JetBrains Mono', 'Monaco', monospace;
+  }
+  
+  .document-prose pre code {
+	@apply bg-transparent text-gray-100 p-0;
+  }
+  
+  /* Tables - professional styling */
+  .document-prose table {
+	@apply w-full border-collapse my-6;
+	border-spacing: 0;
+  }
+  
+  .document-prose thead {
+	@apply bg-gray-50;
+  }
+  
+  .document-prose th {
+	@apply border border-gray-200 px-4 py-3 text-left font-semibold text-gray-900;
+	background-color: #f9fafb;
+  }
+  
+  .document-prose td {
+	@apply border border-gray-200 px-4 py-3 text-gray-800;
+  }
+  
+  .document-prose tbody tr:nth-child(even) {
+	@apply bg-gray-50/50;
+  }
+  
+  .document-prose tbody tr:hover {
+	@apply bg-blue-50/50;
+  }
+  
+  /* Images - your custom resizable images */
+  .document-prose img {
+	@apply my-6 rounded-lg shadow-sm;
+	max-width: 100%;
+	height: auto;
+  }
+  
+  /* Image alignment support - fixed to match editor behavior */
+  .document-prose img[data-align="left"] {
+	display: block;
+	margin-left: 0;
+	margin-right: auto;
+	margin-bottom: 1.5rem;
+	margin-top: 1.5rem;
+  }
+  
+  .document-prose img[data-align="right"] {
+	display: block;
+	margin-left: auto;
+	margin-right: 0;
+	margin-bottom: 1.5rem;
+	margin-top: 1.5rem;
+  }
+  
+  .document-prose img[data-align="center"] {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 1.5rem;
+	margin-top: 1.5rem;
+  }
+  
+  /* Wrapper div approach for more reliable alignment */
+  .document-prose div[data-align="left"] {
+	text-align: left;
+	width: 100%;
+	margin: 1.5rem 0;
+  }
+  
+  .document-prose div[data-align="center"] {
+	text-align: center;
+	width: 100%;
+	margin: 1.5rem 0;
+  }
+  
+  .document-prose div[data-align="right"] {
+	text-align: right;
+	width: 100%;
+	margin: 1.5rem 0;
+  }
+  
+  /* Ensure images inside aligned divs behave properly */
+  .document-prose div[data-align] img {
+	display: inline-block;
+	margin: 0;
+	max-width: 100%;
+  }
+  
+  /* Image captions (if you add caption support) */
+  .document-prose figure {
+	@apply my-6;
+  }
+  
+  .document-prose figcaption {
+	@apply text-sm text-gray-600 text-center mt-2 italic;
+  }
+  
+  /* Horizontal rules */
+  .document-prose hr {
+	@apply border-0 border-t border-gray-300 my-8;
+  }
+  
+  /* Links */
+  .document-prose a {
+	@apply text-blue-600 underline decoration-blue-600/30 underline-offset-2;
+	transition: all 0.2s ease;
+  }
+  
+  .document-prose a:hover {
+	@apply text-blue-700 decoration-blue-700;
+  }
+  
+  /* Text formatting */
+  .document-prose strong {
+	@apply font-semibold text-gray-900;
+  }
+  
+  .document-prose em {
+	@apply italic;
+  }
+  
+  .document-prose u {
+	text-decoration: underline;
+	text-decoration-color: currentColor;
+  }
+  
+  .document-prose s {
+	text-decoration: line-through;
+	text-decoration-color: currentColor;
+  }
+  
+  /* Subscript and superscript */
+  .document-prose sub,
+  .document-prose sup {
+	@apply text-xs;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
+  }
+  
+  .document-prose sup {
+	top: -0.5em;
+  }
+  
+  .document-prose sub {
+	bottom: -0.25em;
+  }
+  
+  /* Text alignment classes */
+  .document-prose [style*="text-align: left"] {
+	text-align: left !important;
+  }
+  
+  .document-prose [style*="text-align: center"] {
+	text-align: center !important;
+  }
+  
+  .document-prose [style*="text-align: right"] {
+	text-align: right !important;
+  }
+  
+  .document-prose [style*="text-align: justify"] {
+	text-align: justify !important;
+  }
+  
+  /* Highlight/Mark text */
+  .document-prose mark {
+	@apply bg-yellow-200 text-gray-900 px-1 rounded;
+  }
+  
+  /* Print styles */
+  @media print {
+	.document-prose {
+	  @apply shadow-none;
+	  max-width: none;
+	  padding: 0.5in;
+	}
+	
+	.document-prose h1,
+	.document-prose h2,
+	.document-prose h3,
+	.document-prose h4,
+	.document-prose h5,
+	.document-prose h6 {
+	  page-break-after: avoid;
+	}
+	
+	.document-prose img {
+	  max-width: 100% !important;
+	  page-break-inside: avoid;
+	}
+	
+	.document-prose blockquote,
+	.document-prose pre,
+	.document-prose table {
+	  page-break-inside: avoid;
+	}
+  }
+  
+  /* Focus states for editor */
+  .document-prose [data-selected="true"] {
+	@apply outline-2 outline-blue-500 outline-offset-2;
+  }
+  
+  /* Placeholder text */
+  .document-prose .ProseMirror-focused .is-empty::before {
+	content: attr(data-placeholder);
+	@apply text-gray-400 pointer-events-none;
+	position: absolute;
+  }
+  
+  /* Selection styles */
+  .document-prose ::selection {
+	@apply bg-blue-200 text-gray-900;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+	.document-prose {
+	  @apply px-4 py-4;
+	  max-width: 100%;
+	}
+	
+	.document-prose h1 {
+	  @apply text-2xl;
+	}
+	
+	.document-prose h2 {
+	  @apply text-xl;
+	}
+	
+	.document-prose h3 {
+	  @apply text-lg;
+	}
+	
+	.document-prose table {
+	  @apply text-sm;
+	}
+	
+	.document-prose th,
+	.document-prose td {
+	  @apply px-2 py-2;
+	}
+  }
