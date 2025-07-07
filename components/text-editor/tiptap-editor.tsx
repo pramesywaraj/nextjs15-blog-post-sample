@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ChangeEvent, ReactNode, useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -68,6 +68,8 @@ export default function TiptapEditor({
   onChange,
 }: TiptapEditorProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -80,11 +82,14 @@ export default function TiptapEditor({
       Highlight,
       CodeBlockLowlight.configure({ lowlight }),
       Heading.configure({
-        levels: [1, 2, 3]
-      })
+        levels: [1, 2, 3],
+      }),
     ],
     content,
     editorProps: {
+      attributes: {
+        "data-placeholder": "Write your post here...",
+      },
       handleDrop: (view, event) => {
         const files = Array.from(event.dataTransfer?.files || []);
         const image = files.find((file) => /image/i.test(file.type));
@@ -96,7 +101,7 @@ export default function TiptapEditor({
       },
       handlePaste: (view, event) => {
         const items = Array.from(event.clipboardData?.items || []);
-        const imageItem = items.find(item => /image/i.test(item.type));
+        const imageItem = items.find((item) => /image/i.test(item.type));
         if (imageItem) {
           const file = imageItem.getAsFile();
           if (file) {
@@ -105,14 +110,14 @@ export default function TiptapEditor({
           }
         }
         return false;
-      }
+      },
     },
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML());
     },
   });
 
-  const handleImageUpload = async (file: File, view: any) => {
+  const handleImageUpload = async (file: File) => {
     // const reader = new FileReader();
     // reader.onload = async (e) => {
     //   const src = reader.result as string;
@@ -127,12 +132,27 @@ export default function TiptapEditor({
     } catch (error) {
       alert("Image upload failed");
     }
-}
+  };
+
+  const handleTriggerSelectFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      await handleImageUpload(file);
+      e.target.value = '';
+    }
+  }
 
   if (!editor) return null;
 
   return (
-    <div className={`tiptap-editor document-prose ${isFullscreen ? "fixed inset-0 w-screen h-screen bg-white z-50 p-8 max-w-none" : "relative w-full"}`}>
+    <div
+      className={`tiptap-editor document-prose ${
+        isFullscreen
+          ? "fixed inset-0 w-screen h-screen bg-white z-50 p-8 max-w-none"
+          : "relative w-full"
+      }`}
+    >
       <div className="toolbar">
         <ToolbarButton onClick={() => setIsFullscreen((v) => !v)}>
           {isFullscreen ? <Minimize2 size={16} /> : <Maximize size={16} />}
@@ -231,15 +251,7 @@ export default function TiptapEditor({
         >
           <LinkIcon size={16} />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() =>
-            editor
-              .chain()
-              .focus()
-              .setImage({ src: window.prompt("Image URL") || "" })
-              .run()
-          }
-        >
+        <ToolbarButton onClick={() => fileInputRef.current?.click()}>
           <ImageIcon size={16} />
         </ToolbarButton>
         {/* <ToolbarButton onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}><TableIcon size={16} /></ToolbarButton> */}
@@ -268,7 +280,20 @@ export default function TiptapEditor({
           <Redo2 size={16} />
         </ToolbarButton>
       </div>
-      <EditorContent editor={editor} className={`prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none ${isFullscreen ? 'w-full h-full !max-w-none': ''}`} />
+
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleTriggerSelectFile}
+      />
+      <EditorContent
+        editor={editor}
+        className={`ProseMirror document-prose ${
+          isFullscreen ? "w-full h-full !max-w-none" : ""
+        }`}
+      />
     </div>
   );
 }
