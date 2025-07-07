@@ -90,22 +90,22 @@ export default function TiptapEditor({
       attributes: {
         "data-placeholder": "Write your post here...",
       },
-      handleDrop: (view, event) => {
+      handleDrop: (_, event) => {
         const files = Array.from(event.dataTransfer?.files || []);
         const image = files.find((file) => /image/i.test(file.type));
         if (image) {
-          handleImageUpload(image, view);
+          handleImageUpload(image);
           return true;
         }
         return false;
       },
-      handlePaste: (view, event) => {
+      handlePaste: (_, event) => {
         const items = Array.from(event.clipboardData?.items || []);
         const imageItem = items.find((item) => /image/i.test(item.type));
         if (imageItem) {
           const file = imageItem.getAsFile();
           if (file) {
-            handleImageUpload(file, view);
+            handleImageUpload(file);
             return true;
           }
         }
@@ -118,13 +118,6 @@ export default function TiptapEditor({
   });
 
   const handleImageUpload = async (file: File) => {
-    // const reader = new FileReader();
-    // reader.onload = async (e) => {
-    //   const src = reader.result as string;
-    //   editor?.chain().focus().setImage({ src }).run();
-    // }
-
-    // reader.readAsDataURL(file);
     try {
       const url = await uploadImageToCloudinary(file);
 
