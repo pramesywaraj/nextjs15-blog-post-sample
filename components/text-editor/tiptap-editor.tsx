@@ -11,6 +11,7 @@ import Heading from "@tiptap/extension-heading";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 
 import ResizableImage from "./resizeable-image";
+import { UploadingImagePlaceholderNode } from "./image-upload-placeholder";
 
 import { createLowlight } from "lowlight";
 import {
@@ -36,7 +37,7 @@ import {
 } from "lucide-react";
 
 import "./styles.css";
-import { uploadImageToCloudinary } from "@/lib/uploadImage";
+import { uploadImageToCloudinary, uploadImageToCloudinaryWithProgress } from "@/lib/uploadImage";
 
 const lowlight = createLowlight();
 
@@ -84,6 +85,7 @@ export default function TiptapEditor({
       Heading.configure({
         levels: [1, 2, 3],
       }),
+      UploadingImagePlaceholderNode,
     ],
     content,
     editorProps: {
@@ -117,12 +119,49 @@ export default function TiptapEditor({
     },
   });
 
-  const handleImageUpload = async (file: File) => {
-    try {
-      const url = await uploadImageToCloudinary(file);
 
+
+  const handleImageUpload = async (file: File) => {
+    editor?.chain().focus().insertContent({
+      type: 'uploadingImage',
+      attrs: { progress: 0, fileName: file.name }
+    }).run();
+
+    const findUploadingImagePosition = () => {
+      let position = null;
+
+      editor?.state.doc.descendants((node, pos) => {
+        if (node.type.name === 'uploadingImage' && node.attrs.fileName === file.name) {
+          position = pos;
+          return false;
+        }
+
+        return true;
+      })
+
+      return position;
+    };
+
+    const imgPosition = findUploadingImagePosition();
+    
+    try {
+      const url = await uploadImageToCloudinaryWithProgress(file, (percent) => {
+        if (imgPosition !== null) {
+          editor?.commands.command(({ tr }) => {
+            tr.setNodeMarkup(imgPosition, undefined, { progress: percent, fileName: file.name });
+            return true;
+          })
+        }
+      });
+
+      if (imgPosition !== null) {
+        editor?.chain().focus().deleteRange({ from: imgPosition, to: imgPosition + 1 });
+      }
       editor?.chain().focus().setImage({ src: url }).run();
     } catch (error) {
+      if (imgPosition !== null) {
+        editor?.chain().focus().deleteRange({ from: imgPosition, to: imgPosition + 1 });
+      }
       alert("Image upload failed");
     }
   };

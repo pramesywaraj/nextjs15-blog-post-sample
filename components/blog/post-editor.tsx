@@ -151,7 +151,6 @@ export default function PostEditor({
 
 	const onSubmit = async (data: PostEditorInput) => {
 		try {
-			console.log("CHECK FORM DATA FIRST", data)
 			// Update form with current content and selections
 			const submitData = {
 				...data,
