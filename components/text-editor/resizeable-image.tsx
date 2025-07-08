@@ -66,7 +66,7 @@ const ResizableImageComponent = (props: any) => {
     whiteSpace: "normal",
     display: "block",
     width: "100%",
-    textAlign: node.attrs.align as "left" | "center" | "right"
+    textAlign: node.attrs.align as "left" | "center" | "right",
   };
 
   return (
@@ -77,6 +77,7 @@ const ResizableImageComponent = (props: any) => {
           src={node.attrs.src}
           alt={node.attrs.alt}
           draggable={false}
+          loading={node.attrs.loading || "lazy"}
           style={{
             width: node.attrs.width ? `${node.attrs.width}px` : "auto",
             display: "block",
@@ -88,6 +89,19 @@ const ResizableImageComponent = (props: any) => {
           }}
         />
         {/* Resize handle: only show when selected */}
+        {node.attrs.description && (
+          <figcaption
+            style={{
+              textAlign: "center",
+              color: "#666",
+              fontSize: 14,
+              marginTop: 8,
+              fontStyle: "italic",
+            }}
+          >
+            {node.attrs.description}
+          </figcaption>
+        )}
         {selected && (
           <>
             <span
@@ -111,6 +125,32 @@ const ResizableImageComponent = (props: any) => {
             >
               ↔️
             </span>
+
+            <button
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                zIndex: 20,
+                background: "#fff",
+                border: "1px solid #888",
+                borderRadius: 4,
+                padding: "2px 6px",
+                fontSize: 12,
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                const alt = window.prompt("Alt text", node.attrs.alt || "");
+                const description = window.prompt(
+                  "Description",
+                  node.attrs.description || ""
+                );
+                updateAttributes({ alt, description });
+              }}
+              type="button"
+            >
+              📝
+            </button>
 
             <div style={alignPopoverStyle}>
               <Popover open={isEnableAlign} onOpenChange={setIsEnableAlign}>
@@ -187,7 +227,63 @@ const ResizableImage = Image.extend({
           };
         },
       },
+      alt: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("alt") || "",
+        renderHTML: (attributes) => {
+          if (!attributes.alt) return {};
+          return { alt: attributes.alt };
+        },
+      },
+      description: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("data-description") || "",
+        renderHTML: (attributes) => {
+          if (!attributes.description) return {};
+
+          return { "data-description": attributes.description };
+        },
+      },
+      loading: {
+        default: "lazy",
+        parseHTML: (element) => element.getAttribute("loading") || "lazy",
+        renderHTML: () => ({
+          loading: "lazy",
+        }),
+      },
     };
+  },
+  renderHTML({ HTMLAttributes }) {
+    const renderedAttributes = {
+        src: HTMLAttributes.src,
+        alt: HTMLAttributes.alt || "",
+        loading: HTMLAttributes.loading || "lazy",
+        width: HTMLAttributes.width,
+        "data-align": HTMLAttributes?.['data-align'] || 'left',
+        style: `text-align: ${HTMLAttributes?.['data-align'] || 'left'}; display: block;`
+    };
+    if (HTMLAttributes?.['data-description']) {
+      return [
+        "figure",
+        {},
+        [
+          "img",
+          {
+            ...renderedAttributes,
+            "data-description": HTMLAttributes['data-description'],
+          },
+        ],
+        [
+          "figcaption",
+          {},
+          HTMLAttributes['data-description'],
+        ],
+      ];
+    }
+    return [
+      "img",
+      renderedAttributes,
+    ];
   },
   addNodeView() {
     return ReactNodeViewRenderer(ResizableImageComponent);
